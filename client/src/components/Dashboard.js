@@ -73,10 +73,11 @@ export default class Dashboard extends React.Component {
         <br></br>
         <div className="container movies-container">
           <div className="jumbotron">
-            <div className="h5">Top Movies</div>
-            <div className="genres-container">
-              {this.state.genres}
-            </div>
+          <div className="h5">Trip Planner</div>
+           <div className="location-input">
+             <input type="text" placeholder="Enter a location" id="location-input" className="location-input"/>
+             <button type="button" class="btn btn-primary">Search</button>
+           </div>
           </div>
 
           <br></br>
