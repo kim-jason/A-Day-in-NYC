@@ -8,6 +8,48 @@ var connection = mysql.createPool(config);
 /* ------------------- Route Handlers --------------- */
 /* -------------------------------------------------- */
 
+function getTaxiZone(req, res) {
+  console.log(req.params);
+  var query =  `
+  WITH distances AS
+  (SELECT zone_name, borough, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.lat}))*SIN(RADIANS(${req.params.lon}-centroid_lng)),2) + POWER(COS(RADIANS(centroid_lat))*SIN(RADIANS(${req.params.lat})) - (SIN(RADIANS(centroid_lat))*COS(RADIANS(${req.params.lat})) * COS(RADIANS(${req.params.lon}-centroid_lng))), 2)), SIN(RADIANS(centroid_lat))*SIN(RADIANS(${req.params.lat})) + COS(RADIANS(centroid_lat))*COS(RADIANS(${req.params.lat}))*COS(RADIANS(${req.params.lon}-centroid_lng)))) AS distance
+  FROM TaxiLookup T)
+  SELECT zone_name, borough
+  FROM distances
+  WHERE distance = (SELECT min(distance) FROM distances)
+  LIMIT 1;
+`;
+connection.query(query, function(err, rows, fields) {
+  if (err) {
+    console.log(err);
+  } else {
+    res.json(rows);
+  }
+});
+};
+
+function getPOIS(req, res) {
+  console.log("HERE");
+  console.log(req.params);
+  var query = 
+  `WITH distances AS
+  (SELECT POI_name, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.lat}))*SIN(RADIANS(${req.params.lon}-lng)),2) + POWER(COS(RADIANS(lat))*SIN(RADIANS(${req.params.lat})) - (SIN(RADIANS(lat))*COS(RADIANS(${req.params.lat})) * COS(RADIANS(${req.params.lon}-lng))), 2)), SIN(RADIANS(lat))*SIN(RADIANS(${req.params.lat})) + COS(RADIANS(lat))*COS(RADIANS(${req.params.lat}))*COS(RADIANS(${req.params.lon}-lng)))) AS distance
+  FROM POIs P)
+  SELECT POI_name
+  FROM distances
+  WHERE distance < ${req.params.distance}
+  ORDER BY POI_name
+  LIMIT 10;
+  
+  `;
+  connection.query(query, function(err, rows, fields) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(rows);
+    }
+  });
+} 
 
 /* ---- Q1a (Dashboard) ---- */
 function getAllGenres(req, res) {
@@ -113,6 +155,8 @@ function bestGenresPerDecade(req, res) {
 
 // The exported functions, which can be accessed in index.js.
 module.exports = {
+  getTaxiZone: getTaxiZone,
+  getPOIS: getPOIS,
 	getAllGenres: getAllGenres,
 	getTopInGenre: getTopInGenre,
 	getRecs: getRecs,
