@@ -1,0 +1,36 @@
+.usercell{
+    display: flex;
+    cursor: pointer;
+    margin: 5px;
+    padding: 20px 20px 15px 20px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+}
+
+.cellinfo{
+    margin-left: 15px;
+    /* align-items: center; */
+}
+
+.header-left{
+    display: flex;
+    align-items: center;
+    width: 100px;
+}
+
+.header-right{
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+}
+
+.cellinfo h4{
+    color: rgb(61, 61, 61);
+}
+
+.header-right p{
+    margin: 0px 0px 10px 0px;
+    color: gray;
+}
