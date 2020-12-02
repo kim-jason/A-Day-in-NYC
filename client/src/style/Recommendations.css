@@ -14,3 +14,48 @@
 .movieResults .title, .movieResults .id, .movieResults .rating, .movieResults .votes, .headers .header {
   flex: 1 0 25%;
 }
+
+.Recommendations{
+  height: 100vh;
+  width: 100vw;
+}
+
+.sidepanel{
+  position:absolute;
+  left:0; top:56px; bottom: 0;
+  width: 500px;
+  background-color: rgb(245, 244, 244);
+  display: flex;
+  flex-direction: column;
+}
+
+.map{
+  position: absolute;
+  left:500px; top:56px; right:0; bottom:0;
+}
+
+.location-input{
+  margin: 10px 5px 10px 5px;
+  padding: 10px;
+  background-color: rgb(255, 255, 255);
+}
+
+.autocomplete {
+  margin: 10px;
+}
+
+
+
+.autocomplete input[type=text] {
+  padding: 0;
+  height: 40px;
+  width: 100%;
+  position: relative;
+  left: 0;
+  outline: none;
+  border: 1px solid #60a7f8;
+  border-color:#60a7f8;
+
+  background-color: rgba(255, 255, 255, 0);
+  font-size: 16px;
+}
