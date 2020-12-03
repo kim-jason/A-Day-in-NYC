@@ -227,6 +227,20 @@ export default class Dashboard extends React.Component {
                   onChange={this.handleChange}
                 />
             </div>
+            <div class="slidecontainer">
+                <input type="range" min="0.1" max="1" value={this.state.distance} step="0.1" class="slider" id="myRange" onChange={this.handleChange} />
+                <p>Distance: {this.state.distance} <span id="demo"></span></p>
+              </div>
+              <div className="jumbotron">
+              <div className="movies-container">
+                <div className="movies-header">
+                  <div className="header-lg"><strong>{ this.state.locations.length == 0 ? ""  : "Name"}</strong></div>
+                </div>
+                <div className="results-container" id="results">
+                  {this.state.locations}
+                </div>
+              </div>
+              </div>
           </div>
           <br></br>
           <div className="jumbotron">
