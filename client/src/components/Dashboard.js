@@ -5,6 +5,8 @@ import PageNavbar from './PageNavbar';
 import GenreButton from './GenreButton';
 import DashboardMovieRow from './DashboardMovieRow';
 import Autocomplete from './Autocomplete';
+import POICells from './POICells';
+import Slider from '@material-ui/core/Slider';
 
 export default class Dashboard extends React.Component {
   constructor(props) {
@@ -13,62 +15,64 @@ export default class Dashboard extends React.Component {
     // The state maintained by this React Component. This component maintains the list of genres,
     // and a list of movies for a specified genre.
     this.state = {
-      locationName: "",
       distance: 0.5,
+      zone: "",
       locations: [],
       interests: [],
       favorites: []
     }
 
-    this.handleLocationNameChange = this.handleLocationNameChange.bind(this);
-    this.submitLocation = this.submitLocation.bind(this);
+    // this.handleLocationNameChange = this.handleLocationNameChange.bind(this);
+    // this.submitLocation = this.submitLocation.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.submitPOIS = this.submitPOIS.bind(this);
+    this.addressSelected = this.addressSelected.bind(this);
+    this.addToFavorites = this.addToFavorites.bind(this);
     
   }
 
-  handleLocationNameChange(e) {
-    this.setState({
-      locationName: e.target.value
-    });
-  }
+  // handleLocationNameChange(e) {
+  //   this.setState({
+  //     locationName: e.target.value
+  //   });
+  // }
 
-  handleLocationClick(location) {
-    console.log(location);
-  }
+  // handleLocationClick(location) {
+  //   console.log(location);
+  // }
 
-  submitLocation() {
-    const params = new URLSearchParams({
-      street: this.state.locationName,
-      city: 'Manhattan',
-      county: 'New York',
-      state: 'New York',
-      country: 'United States of America',
-      format: 'json'
-    })
+  // submitLocation() {
+  //   const params = new URLSearchParams({
+  //     street: this.state.locationName,
+  //     city: 'Manhattan',
+  //     county: 'New York',
+  //     state: 'New York',
+  //     country: 'United States of America',
+  //     format: 'json'
+  //   })
   
 
-    fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
-      method: 'GET'
-    })
-    .then(res => res.json())
-    .then(locationList => {
-      if (!locationList) return;
-      let addresses = locationList.map((locationObj, i) => 
-      <>
-        <DashboardMovieRow name={locationObj.display_name} lat={locationObj.lat} lon={locationObj.lon} dist={this.state.distance}/>
-        <button type="button" class="btn btn-info" onClick={() => this.submitPOIS(locationObj.lat, locationObj.lon, this.state.distance)}>Select</button>
-      </>
-        );
-      locationList.map((location, i) => {
-        console.log(location);
-      } )
-      this.setState({
-        locations: addresses
-      })
-    })
-    .catch(err => console.log(err))
-  }
+  //   fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+  //     method: 'GET'
+  //   })
+  //   .then(res => res.json())
+  //   .then(locationList => {
+  //     if (!locationList) return;
+  //     let addresses = locationList.map((locationObj, i) => 
+  //     <>
+  //       <DashboardMovieRow name={locationObj.display_name} lat={locationObj.lat} lon={locationObj.lon} dist={this.state.distance}/>
+  //       <button type="button" class="btn btn-info" onClick={() => this.submitPOIS(locationObj.lat, locationObj.lon, this.state.distance)}>Select</button>
+  //     </>
+  //       );
+  //     locationList.map((location, i) => {
+  //       console.log(location);
+  //     } )
+  //     this.setState({
+  //       locations: addresses
+  //     })
+  //   })
+  //   .catch(err => console.log(err))
+  // }
 
   // React function that is called when the page load.
   componentDidMount() {
@@ -102,9 +106,9 @@ export default class Dashboard extends React.Component {
   }
 
   handleChange(event) {
-    console.log(event.target.value);
+    console.log(event.target.ariaValueText);
     this.setState({
-      distance: event.target.value
+      distance: event.target.ariaValueText
     })
   }
 
@@ -117,7 +121,7 @@ export default class Dashboard extends React.Component {
 		.then(POIList => {
 			if(!POIList) return;
       let pois = POIList.map((poiObj, i) => 
-      <DashboardMovieRow name={poiObj.POI_name}/>
+      <POICells name={poiObj.POI_name} addToFavorites={this.addToFavorites}/>
       );
       POIList.map((pobj, i) => {
         console.log(pobj);
@@ -140,7 +144,20 @@ export default class Dashboard extends React.Component {
     })
   }
   
-  
+  addToFavorites(name, favorite) {
+    console.log(name);
+    console.log(favorite);
+    var joined = [];
+    if (favorite) {
+      joined = this.state.favorites.concat(name);
+    } else {
+      console.log(this.state.favorites.indexOf(name));
+      joined = this.state.favorites.splice(0,1)
+    }
+    this.setState( {
+      favorites: joined
+    })
+  } 
 
   /* ---- Q1b (Dashboard) ---- */
   /* Set this.state.movies to a list of <DashboardMovieRow />'s. */
@@ -163,8 +180,18 @@ export default class Dashboard extends React.Component {
 
   }
 
+  addressSelected(latLng) {
+    console.log(latLng);
+    this.submitPOIS(latLng.lat, latLng.lng, this.state.distance);
+  }
+
+  valuetext(value) {
+    return `${value}`;
+  }
+
   render() {  
-    console.log(this.props);
+    // console.log("FAVORITES");
+    // console.log(this.state.favorites);
     return (
       <div className="Dashboard">
 
@@ -175,7 +202,7 @@ export default class Dashboard extends React.Component {
           <div className="jumbotron">
           <div className="h5">Trip Planner</div>
            <div className="location-input" style={{flexDirection: "row"}}>
-             <Autocomplete />
+             <Autocomplete addressSelected={this.addressSelected} />
              {/* <input type="text" placeholder="Enter a location" value={this.state.locationName} 
              onChange={this.handleLocationNameChange} id="location-input" className="location-input"/>
              <span class="horizontalgap" style={{width: '10px', marginLeft: '20px' }}>
@@ -185,19 +212,21 @@ export default class Dashboard extends React.Component {
            <div class="d-flex justify-content-center my-4">
             </div>
             <div class="slidecontainer">
-                <input type="range" min="0.1" max="1" value={this.state.distance} step="0.1" class="slider" id="myRange" onChange={this.handleChange} />
+                {/* <input type="range" min="0.1" max="1" value={this.state.distance} step="0.1" class="slider" id="myRange" onChange={this.handleChange} /> */}
                 <p>Distance: {this.state.distance} <span id="demo"></span></p>
-              </div>
-              <div className="jumbotron">
-              <div className="movies-container">
-                <div className="movies-header">
-                  <div className="header-lg"><strong>{ this.state.locations.length == 0 ? ""  : "Name"}</strong></div>
-                </div>
-                <div className="results-container" id="results">
-                  {this.state.locations}
-                </div>
-              </div>
-              </div>
+                <Slider
+                  defaultValue={0.5}
+                  getAriaValueText={this.valuetext}
+                  aria-labelledby="discrete-slider"
+                  valueLabelDisplay="auto"
+                  step={0.1}
+                  marks
+                  min={0}
+                  max={1}
+                  style={{width: 300}}
+                  onChange={this.handleChange}
+                />
+            </div>
           </div>
           <br></br>
           <div className="jumbotron">
