@@ -80,6 +80,10 @@ export default class Recommendations extends React.Component {
 		// }
 	}
 
+	addressSelected(latLng) {
+        console.log(latLng);
+    }
+
 	render() {
 
 		return (
@@ -87,9 +91,9 @@ export default class Recommendations extends React.Component {
 				<PageNavbar active="recommendations" />
 				<div className="sidepanel">
 					<div className="location-input">
-						<h6>start: </h6> <Autocomplete />
+						<h6>start: </h6> <Autocomplete addressSelected={this.addressSelected}/>
 						<br/>
-						<h6>destination: </h6><Autocomplete />
+						<h6>destination: </h6><Autocomplete addressSelected={this.addressSelected}/>
 					</div>
 					<ResultCells />
 				</div>
