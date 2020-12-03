@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
 import GenreButton from './GenreButton';
 import DashboardMovieRow from './DashboardMovieRow';
+import Autocomplete from './Autocomplete';
 
 export default class Dashboard extends React.Component {
   constructor(props) {
@@ -163,6 +164,7 @@ export default class Dashboard extends React.Component {
   }
 
   render() {  
+    console.log(this.props);
     return (
       <div className="Dashboard">
 
@@ -173,11 +175,12 @@ export default class Dashboard extends React.Component {
           <div className="jumbotron">
           <div className="h5">Trip Planner</div>
            <div className="location-input" style={{flexDirection: "row"}}>
-             <input type="text" placeholder="Enter a location" value={this.state.locationName} 
+             <Autocomplete />
+             {/* <input type="text" placeholder="Enter a location" value={this.state.locationName} 
              onChange={this.handleLocationNameChange} id="location-input" className="location-input"/>
              <span class="horizontalgap" style={{width: '10px', marginLeft: '20px' }}>
              <button type="button" class="btn btn-primary" onClick={this.submitLocation}>Search</button>
-             </span>
+             </span> */}
            </div>
            <div class="d-flex justify-content-center my-4">
             </div>
