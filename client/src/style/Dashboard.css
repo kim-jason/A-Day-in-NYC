@@ -32,3 +32,11 @@
 .movies-header .header, .movie .rating, .movie .votes {
   flex: 1 0 25%;
 }
+
+.Dashboard {
+  background-color: rgb(245, 245, 244);
+}
+
+.jumbotron {
+  background-color: rgb(149, 213, 245) !important;
+}
