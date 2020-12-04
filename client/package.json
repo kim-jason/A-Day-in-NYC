@@ -21,6 +21,7 @@
     "react-places-autocomplete": "^7.3.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4.0",
+    "react-vis": "^1.11.7",
     "selenium-webdriver": "^4.0.0-alpha.5",
     "use-places-autocomplete": "^1.6.0"
   },

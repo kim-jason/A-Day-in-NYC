@@ -51,6 +51,25 @@ function getPOIS(req, res) {
   });
 } 
 
+function getStations(req, res) {
+  
+  var query = `WITH distances AS
+  (SELECT station_name, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.lat}))*SIN(RADIANS(${req.params.lon}-lng)),2) + POWER(COS(RADIANS(lat))*SIN(RADIANS(${req.params.lat})) - (SIN(RADIANS(lat))*COS(RADIANS(${req.params.lat})) * COS(RADIANS(${req.params.lon}-lng))), 2)), SIN(RADIANS(lat))*SIN(RADIANS(${req.params.lat})) + COS(RADIANS(lat))*COS(RADIANS(${req.params.lat}))*COS(RADIANS(${req.params.lon}-lng)))) AS distance
+  FROM Stations S)
+  SELECT station_name
+  FROM distances
+  WHERE distance < ${req.params.distance}
+  ORDER BY station_name;
+  `;
+  connection.query(query, function(err, rows, fields) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(rows);
+    }
+  });
+}
+
 /* ---- Q1a (Dashboard) ---- */
 function getAllGenres(req, res) {
   var query = `
@@ -157,6 +176,7 @@ function bestGenresPerDecade(req, res) {
 module.exports = {
   getTaxiZone: getTaxiZone,
   getPOIS: getPOIS,
+  getStations: getStations,
 	getAllGenres: getAllGenres,
 	getTopInGenre: getTopInGenre,
 	getRecs: getRecs,

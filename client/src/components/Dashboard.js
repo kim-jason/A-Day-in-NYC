@@ -7,6 +7,8 @@ import DashboardMovieRow from './DashboardMovieRow';
 import Autocomplete from './Autocomplete';
 import POICells from './POICells';
 import Slider from '@material-ui/core/Slider';
+import FavoriteCells from './FavoriteCells';
+import {XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries, VerticalBarSeries, VerticalGridLines, LabelSeries} from 'react-vis';
 
 export default class Dashboard extends React.Component {
   constructor(props) {
@@ -17,7 +19,7 @@ export default class Dashboard extends React.Component {
     this.state = {
       distance: 0.5,
       zone: "",
-      locations: [],
+      stations: [],
       interests: [],
       favorites: []
     }
@@ -28,7 +30,7 @@ export default class Dashboard extends React.Component {
     this.submitPOIS = this.submitPOIS.bind(this);
     this.addressSelected = this.addressSelected.bind(this);
     this.addToFavorites = this.addToFavorites.bind(this);
-    
+    this.getStations = this.getStations.bind(this);
   }
 
   // handleLocationNameChange(e) {
@@ -143,16 +145,32 @@ export default class Dashboard extends React.Component {
       console.log(zoneList);
     })
   }
+
+  getStations(lat, lon, distance) {
+    console.log("Got to this point");
+    fetch(`http://localhost:8081/stations/${lat}/${lon}/${distance}`, {
+      method: 'GET'
+    })
+    .then(res => res.json())
+    .then(stationList => {
+      if(!stationList) return;
+      let sList = stationList.map((stationObj, i) => 
+        <FavoriteCells name={stationObj.station_name}/>
+      )
+      this.setState({
+        stations: sList
+      })
+    })
+    .catch(err => console.log(err))
+  }
   
   addToFavorites(name, favorite) {
-    console.log(name);
-    console.log(favorite);
     var joined = [];
     if (favorite) {
-      joined = this.state.favorites.concat(name);
+      let fobj = <FavoriteCells name={name}/>
+      joined = this.state.favorites.concat(fobj);
     } else {
-      console.log(this.state.favorites.indexOf(name));
-      joined = this.state.favorites.splice(0,1)
+      joined = this.state.favorites.filter(item => item.props.name !== name);
     }
     this.setState( {
       favorites: joined
@@ -182,7 +200,8 @@ export default class Dashboard extends React.Component {
 
   addressSelected(latLng) {
     console.log(latLng);
-    this.submitPOIS(latLng.lat, latLng.lng, this.state.distance);
+    this.submitPOIS(latLng.lat, latLng.lng, this.state.distance)
+    this.getStations(latLng.lat, latLng.lng, this.state.distance)
   }
 
   valuetext(value) {
@@ -190,8 +209,6 @@ export default class Dashboard extends React.Component {
   }
 
   render() {  
-    // console.log("FAVORITES");
-    // console.log(this.state.favorites);
     return (
       <div className="Dashboard">
 
@@ -213,7 +230,7 @@ export default class Dashboard extends React.Component {
             </div>
             <div class="slidecontainer">
                 {/* <input type="range" min="0.1" max="1" value={this.state.distance} step="0.1" class="slider" id="myRange" onChange={this.handleChange} /> */}
-                <p>Distance: {this.state.distance} <span id="demo"></span></p>
+                {/* <p>Distance: {this.state.distance} <span id="demo"></span></p> */}
                 <Slider
                   defaultValue={0.5}
                   getAriaValueText={this.valuetext}
@@ -228,16 +245,15 @@ export default class Dashboard extends React.Component {
                 />
             </div>
             <div class="slidecontainer">
-                <input type="range" min="0.1" max="1" value={this.state.distance} step="0.1" class="slider" id="myRange" onChange={this.handleChange} />
                 <p>Distance: {this.state.distance} <span id="demo"></span></p>
               </div>
               <div className="jumbotron">
               <div className="movies-container">
                 <div className="movies-header">
-                  <div className="header-lg"><strong>{ this.state.locations.length == 0 ? ""  : "Name"}</strong></div>
+                  <div className="header-lg"><strong>{ this.state.stations.length == 0 ? ""  : "Stations"}</strong></div>
                 </div>
                 <div className="results-container" id="results">
-                  {this.state.locations}
+                  {this.state.stations}
                 </div>
               </div>
               </div>
@@ -252,6 +268,31 @@ export default class Dashboard extends React.Component {
                 {this.state.interests}
               </div>
             </div>
+          </div>
+          <div className="jumbotron">
+            <div className="favorites-container">
+              <div className="favorites-header">
+                <div className="header-lg"><strong>Favorites</strong></div>
+              </div>
+              <div className="results-container" id="results">
+                {this.state.favorites}
+              </div>
+            </div>
+          </div>
+          <div className="jumbotron">
+          <XYPlot xType="ordinal" width={300} height={300} xDistance={100}>
+          <VerticalGridLines />
+          <HorizontalGridLines />
+          <XAxis />
+          <YAxis />
+          <VerticalBarSeries className="vertical-bar-series-example" data={[
+  {x: 'Times Square', y: 10},
+  {x: '5th Avenue', y: 5},
+  {x: 'Soho', y: 15}
+]} />
+          <LabelSeries />
+        </XYPlot>
+
           </div>
         </div>
       </div>
