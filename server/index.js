@@ -29,6 +29,10 @@ app.get('/pois/:lat/:lon/:distance', routes.getPOIS);
 
 app.get('/stations/:lat/:lon/:distance', routes.getStations);
 
+app.get('/zones', routes.getAllZones);
+
+app.get('/pois/:zone', routes.getNumPOIS);
+
 /* ---- Q1b (Dashboard) ---- */
 app.get('/genres/:genre', routes.getTopInGenre); // Hint: Replace () => {} with the appropriate route handler.
 

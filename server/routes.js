@@ -51,6 +51,17 @@ function getPOIS(req, res) {
   });
 } 
 
+function getAllZones(req, res) {
+  var query = `SELECT zone_name FROM TaxiLookup;`;
+  connection.query(query, function(err, rows, fields) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(rows);
+    }
+  });
+}
+
 function getStations(req, res) {
   
   var query = `WITH distances AS
@@ -60,6 +71,50 @@ function getStations(req, res) {
   FROM distances
   WHERE distance < ${req.params.distance}
   ORDER BY station_name;
+  `;
+  connection.query(query, function(err, rows, fields) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(rows);
+    }
+  });
+}
+
+function getNumPOIS(req, res) {
+  console.log(req.params);
+  var query = `WITH coords AS
+  (SELECT centroid_lat, centroid_lng FROM TaxiLookup T WHERE zone_name='${req.params.zone}' LIMIT 1),
+  POI_distances AS
+  (SELECT POI_name, lat, lng, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(centroid_lat))*SIN(RADIANS(centroid_lng-lng)),2) + POWER(COS(RADIANS(lat))*SIN(RADIANS(centroid_lat)) - (SIN(RADIANS(lat))*COS(RADIANS(centroid_lat)) * COS(RADIANS(centroid_lng-lng))), 2)), SIN(RADIANS(lat))*SIN(RADIANS(centroid_lat)) + COS(RADIANS(lat))*COS(RADIANS(centroid_lat))*COS(RADIANS(centroid_lng-lng)))) AS distance
+  FROM POIs P, coords C),
+  candidate_pts AS
+  (SELECT POI_name, lat, lng
+  FROM POI_distances
+  WHERE distance < 3
+  ORDER BY POI_name),
+  zone_distances AS
+  (SELECT zone_name, T.centroid_lat, T.centroid_lng, borough, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(T.centroid_lat))*SIN(RADIANS(T.centroid_lng-C.centroid_lng)),2) + POWER(COS(RADIANS(C.centroid_lat))*SIN(RADIANS(T.centroid_lat)) - (SIN(RADIANS(C.centroid_lat))*COS(RADIANS(T.centroid_lat)) * COS(RADIANS(T.centroid_lng-C.centroid_lng))), 2)), SIN(RADIANS(C.centroid_lat))*SIN(RADIANS(T.centroid_lat)) + COS(RADIANS(C.centroid_lat))*COS(RADIANS(T.centroid_lat))*COS(RADIANS(T.centroid_lng-C.centroid_lng)))) AS distance
+  FROM TaxiLookup T, coords C),
+  candidate_zones AS
+  (SELECT DISTINCT zone_name, borough, centroid_lat, centroid_lng
+  FROM zone_distances
+  ORDER BY distance
+  LIMIT 10),
+  poi_zones_pairs AS (
+  SELECT p.POI_name, t.zone_name, t.borough, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(centroid_lat))*SIN(RADIANS(centroid_lng - lng)),2) + POWER(COS(RADIANS(lat))*SIN(RADIANS(centroid_lat)) - (SIN(RADIANS(lat))*COS(RADIANS( centroid_lat)) * COS(RADIANS(centroid_lng - lng))), 2)), SIN(RADIANS(lat))*SIN(RADIANS(centroid_lat)) + COS(RADIANS(lat))*COS(RADIANS(centroid_lat))*COS(RADIANS(centroid_lng - lng)))) AS distance
+  FROM candidate_pts p, candidate_zones t),
+  min_distances AS (
+  SELECT POI_name, MIN(distance) AS min_d
+  FROM poi_zones_pairs
+  GROUP BY POI_name),
+  closest AS (
+  SELECT DISTINCT z.POI_name, z.zone_name, z.borough
+  FROM min_distances m JOIN poi_zones_pairs z ON m.min_d = z.distance AND m.POI_name = z.POI_name)
+  SELECT zone_name AS x, COUNT(POI_name) AS y
+  FROM closest
+  WHERE zone_name = '${req.params.zone}' 
+  GROUP BY zone_name, borough;
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) {
@@ -177,6 +232,8 @@ module.exports = {
   getTaxiZone: getTaxiZone,
   getPOIS: getPOIS,
   getStations: getStations,
+  getNumPOIS: getNumPOIS,
+  getAllZones: getAllZones,
 	getAllGenres: getAllGenres,
 	getTopInGenre: getTopInGenre,
 	getRecs: getRecs,
