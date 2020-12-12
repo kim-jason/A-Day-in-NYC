@@ -1,6 +1,4 @@
 .usercell{
-    display: flex;
-    cursor: pointer;
     margin: 5px;
     padding: 20px 20px 15px 20px;
     border-radius: 6px;
@@ -33,4 +31,24 @@
 .header-right p{
     margin: 0px 0px 10px 0px;
     color: gray;
+}
+
+.subwaycell{
+    margin: 5px;
+    padding: 30px 20px 15px 20px;
+    border-radius: 6px;
+    background-color: white;
+    /* display: flex;
+    flex-direction: column; */
+}
+
+.header-cont{
+    display: flex;
+    justify-content: space-between;
+}
+
+.subwayDirections{
+    /* background-color: violet; */
+    padding-left: 10px;
+    padding-top: 5px;
 }
