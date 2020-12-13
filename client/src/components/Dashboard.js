@@ -4,9 +4,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
 import GenreButton from './GenreButton';
 import DashboardMovieRow from './DashboardMovieRow';
-import Autocomplete from './Autocomplete';
+import Autocomp from './Autocomplete';
 import POICells from './POICells';
 import Slider from '@material-ui/core/Slider';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import FavoriteCells from './FavoriteCells';
 import {XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries, VerticalBarSeries, VerticalGridLines, LabelSeries} from 'react-vis';
 
@@ -21,7 +23,9 @@ export default class Dashboard extends React.Component {
       zone: "",
       stations: [],
       interests: [],
-      favorites: []
+      favorites: [],
+      allZones: [],
+      graphData: []
     }
 
     // this.handleLocationNameChange = this.handleLocationNameChange.bind(this);
@@ -31,80 +35,28 @@ export default class Dashboard extends React.Component {
     this.addressSelected = this.addressSelected.bind(this);
     this.addToFavorites = this.addToFavorites.bind(this);
     this.getStations = this.getStations.bind(this);
+    this.setZone = this.setZone.bind(this);
+    this.getNumPOIS = this.getNumPOIS.bind(this);
+    this.removePOI = this.removePOI.bind(this);
   }
 
-  // handleLocationNameChange(e) {
-  //   this.setState({
-  //     locationName: e.target.value
-  //   });
-  // }
-
-  // handleLocationClick(location) {
-  //   console.log(location);
-  // }
-
-  // submitLocation() {
-  //   const params = new URLSearchParams({
-  //     street: this.state.locationName,
-  //     city: 'Manhattan',
-  //     county: 'New York',
-  //     state: 'New York',
-  //     country: 'United States of America',
-  //     format: 'json'
-  //   })
-  
-
-  //   fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
-  //     method: 'GET'
-  //   })
-  //   .then(res => res.json())
-  //   .then(locationList => {
-  //     if (!locationList) return;
-  //     let addresses = locationList.map((locationObj, i) => 
-  //     <>
-  //       <DashboardMovieRow name={locationObj.display_name} lat={locationObj.lat} lon={locationObj.lon} dist={this.state.distance}/>
-  //       <button type="button" class="btn btn-info" onClick={() => this.submitPOIS(locationObj.lat, locationObj.lon, this.state.distance)}>Select</button>
-  //     </>
-  //       );
-  //     locationList.map((location, i) => {
-  //       console.log(location);
-  //     } )
-  //     this.setState({
-  //       locations: addresses
-  //     })
-  //   })
-  //   .catch(err => console.log(err))
-  // }
 
   // React function that is called when the page load.
   componentDidMount() {
-    // // Send an HTTP request to the server.
-    // fetch("http://localhost:8081/genres", {
-    //   method: 'GET' // The type of HTTP request.
-    // })
-    //   .then(res => res.json()) // Convert the response data to a JSON.
-    //   .then(genreList => {
-    //     if (!genreList) return;
-    //     // Map each genreObj in genreList to an HTML element:
-    //     // A button which triggers the showMovies function for each genre.
-    //     let genreDivs = genreList.map((genreObj, i) =>
-    //       <GenreButton id={"button-" + genreObj.genre} onClick={() => this.showMovies(genreObj.genre)} genre={genreObj.genre} />
-    //     );
-
-    //     // Set the state of the genres list to the value returned by the HTTP response from the server.
-    //     this.setState({
-    //       genres: genreDivs
-    //     })
-    //   })
-    //   .catch(err => console.log(err))	// Print the error if there is one.
-    // var slider = document.getElementById("myRange");
-    // var output = document.getElementById("demo");
-    // output.innerHTML = slider.value; // Display the default slider value
-    // // Update the current slider value (each time you drag the slider handle)
-    // slider.oninput = function() {
-    //   output.innerHTML = this.value;
-    //   console.log(slider.value);
-    // }
+    fetch(`http://localhost:8081/zones/`, {
+      method: 'GET'
+    })
+    .then(res => res.json())
+    .then(zoneList => {
+      if(!zoneList) return;
+      let zList = zoneList.map((zoneObj, i) => 
+        zoneObj.zone_name
+      )
+      this.setState({
+        allZones: zList
+      })
+    })
+    .catch(err => console.log(err))
   }
 
   handleChange(event) {
@@ -145,6 +97,7 @@ export default class Dashboard extends React.Component {
       console.log(zoneList);
     })
   }
+  
 
   getStations(lat, lon, distance) {
     console.log("Got to this point");
@@ -176,6 +129,47 @@ export default class Dashboard extends React.Component {
       favorites: joined
     })
   } 
+
+  setZone(event, value) {
+    this.setState({
+      zone: value
+    })
+  }
+
+  getZones() {
+    fetch(`http://localhost:8081/zones/`, {
+      method: 'GET'
+    })
+    .then(res => res.json())
+    .then(zoneList => {
+      console.log(zoneList)
+    })
+    .catch(err => console.log(err))
+  }
+
+  getNumPOIS() {
+    var zParams = encodeURIComponent(this.state.zone);
+    fetch(`http://localhost:8081/pois/${zParams}`, {
+      method: 'GET'
+    })
+    .then(res => res.json())
+    .then(POIList => {
+      let zone = this.state.graphData.concat(POIList)
+      console.log(zone);
+      this.setState({
+        graphData: zone
+      })
+    })
+    .catch(err => console.log(err))
+  }
+
+  removePOI() {
+    var arr = this.state.graphData
+    arr.pop();
+    this.setState({
+      graphData: arr
+    })
+  }
 
   /* ---- Q1b (Dashboard) ---- */
   /* Set this.state.movies to a list of <DashboardMovieRow />'s. */
@@ -219,7 +213,7 @@ export default class Dashboard extends React.Component {
           <div className="jumbotron">
           <div className="h5">Trip Planner</div>
            <div className="location-input" style={{flexDirection: "row"}}>
-             <Autocomplete addressSelected={this.addressSelected} />
+             <Autocomp addressSelected={this.addressSelected} />
              {/* <input type="text" placeholder="Enter a location" value={this.state.locationName} 
              onChange={this.handleLocationNameChange} id="location-input" className="location-input"/>
              <span class="horizontalgap" style={{width: '10px', marginLeft: '20px' }}>
@@ -229,8 +223,6 @@ export default class Dashboard extends React.Component {
            <div class="d-flex justify-content-center my-4">
             </div>
             <div class="slidecontainer">
-                {/* <input type="range" min="0.1" max="1" value={this.state.distance} step="0.1" class="slider" id="myRange" onChange={this.handleChange} /> */}
-                {/* <p>Distance: {this.state.distance} <span id="demo"></span></p> */}
                 <Slider
                   defaultValue={0.5}
                   getAriaValueText={this.valuetext}
@@ -245,7 +237,7 @@ export default class Dashboard extends React.Component {
                 />
             </div>
             <div class="slidecontainer">
-                <p>Distance: {this.state.distance} <span id="demo"></span></p>
+                <p>Distance: {this.state.distance}</p>
               </div>
               <div className="jumbotron">
               <div className="movies-container">
@@ -280,18 +272,32 @@ export default class Dashboard extends React.Component {
             </div>
           </div>
           <div className="jumbotron">
-          <XYPlot xType="ordinal" width={300} height={300} xDistance={100}>
+            <div class="input">
+              <label for="zone"></label>
+              <Autocomplete
+                id="zones-dropdown"
+                options={this.state.allZones}
+                getOptionLabel={(option) => option}
+                style={{ width: 300 }}
+                onChange={this.setZone}
+                renderInput={(params) => <TextField {...params} label="All Zones" variant="outlined" />}
+              />
+              <br></br>
+              <button class="btn btn-success" onClick={this.getNumPOIS} >Enter</button>
+              &nbsp;
+              &nbsp;
+              <button class="btn btn-danger" onClick={this.removePOI} >Delete</button>
+              <br></br>
+              <br></br>
+              <br></br>
+            </div>
+          <XYPlot xType="ordinal" width={750} height={500} xDistance={150}>
           <VerticalGridLines />
           <HorizontalGridLines />
           <XAxis />
           <YAxis />
-          <VerticalBarSeries className="vertical-bar-series-example" data={[
-  {x: 'Times Square', y: 10},
-  {x: '5th Avenue', y: 5},
-  {x: 'Soho', y: 15}
-]} />
-          <LabelSeries />
-        </XYPlot>
+          <VerticalBarSeries className="vertical-bar-series-example" data={this.state.graphData} />
+          </XYPlot>
 
           </div>
         </div>

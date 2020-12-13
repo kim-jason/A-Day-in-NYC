@@ -4,8 +4,5 @@ module.exports = {
   port: "3306",
   user: "admin",
   password: "nZ8uT5eQ6nI2aW2k",
-  database: "group42",
-  // connectTimeout  : 60 * 60 * 1000,
-  // acquireTimeout  : 60 * 60 * 1000,
-  // timeout         : 60 * 60 * 1000,
+  database: "group42"
 };
