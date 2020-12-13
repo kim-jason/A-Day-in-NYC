@@ -7,6 +7,7 @@ import {
 import Dashboard from './Dashboard';
 import Recommendations from './Recommendations';
 import BestGenres from './BestGenres';
+import Login from './Login';
 
 export default class App extends React.Component {
 
@@ -19,7 +20,7 @@ export default class App extends React.Component {
 							exact
 							path="/"
 							render={() => (
-								<Dashboard />
+								<Login />
 							)}
 						/>
 						<Route

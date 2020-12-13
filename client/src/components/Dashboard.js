@@ -148,7 +148,8 @@ export default class Dashboard extends React.Component {
   }
 
   getNumPOIS() {
-    fetch(`http://localhost:8081/pois/${this.state.zone}`, {
+    var zParams = encodeURIComponent(this.state.zone);
+    fetch(`http://localhost:8081/pois/${zParams}`, {
       method: 'GET'
     })
     .then(res => res.json())
@@ -222,8 +223,6 @@ export default class Dashboard extends React.Component {
            <div class="d-flex justify-content-center my-4">
             </div>
             <div class="slidecontainer">
-                {/* <input type="range" min="0.1" max="1" value={this.state.distance} step="0.1" class="slider" id="myRange" onChange={this.handleChange} /> */}
-                {/* <p>Distance: {this.state.distance} <span id="demo"></span></p> */}
                 <Slider
                   defaultValue={0.5}
                   getAriaValueText={this.valuetext}
@@ -238,7 +237,7 @@ export default class Dashboard extends React.Component {
                 />
             </div>
             <div class="slidecontainer">
-                <p>Distance: {this.state.distance} <span id="demo"></span></p>
+                <p>Distance: {this.state.distance}</p>
               </div>
               <div className="jumbotron">
               <div className="movies-container">
@@ -275,8 +274,6 @@ export default class Dashboard extends React.Component {
           <div className="jumbotron">
             <div class="input">
               <label for="zone"></label>
-              {/* <input type="text" id="zoneName" placeholder="Type Zone Name" onChange={this.setZone} ></input> */}
-              {/* <button class="btn btn-primary" onClick={this.getNumPOIS} >Enter</button> */}
               <Autocomplete
                 id="zones-dropdown"
                 options={this.state.allZones}
@@ -286,7 +283,7 @@ export default class Dashboard extends React.Component {
                 renderInput={(params) => <TextField {...params} label="All Zones" variant="outlined" />}
               />
               <br></br>
-              <button class="btn btn-primary" onClick={this.getNumPOIS} >Enter</button>
+              <button class="btn btn-success" onClick={this.getNumPOIS} >Enter</button>
               &nbsp;
               &nbsp;
               <button class="btn btn-danger" onClick={this.removePOI} >Delete</button>
@@ -294,7 +291,7 @@ export default class Dashboard extends React.Component {
               <br></br>
               <br></br>
             </div>
-          <XYPlot xType="ordinal" width={400} height={300} xDistance={100}>
+          <XYPlot xType="ordinal" width={750} height={500} xDistance={150}>
           <VerticalGridLines />
           <HorizontalGridLines />
           <XAxis />
