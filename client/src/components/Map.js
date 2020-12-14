@@ -2,12 +2,12 @@ import React from 'react';
 import '../style/Recommendations.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
-import { Map, GoogleApiWrapper } from 'google-maps-react';
+import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 import ResultCells from './ResultCells';
 
 const mapStyles = {
-  width: '100%',
-  height: '100%'
+	width: '100%',
+	height: '100%'
 };
 
 
@@ -31,16 +31,33 @@ class MapContainer extends React.Component {
 		return (
 			<div className="map2">
 				<Map
-        			google={this.props.google}
-        			zoom={13}
-        			style={mapStyles}
-        			initialCenter={{lat: 40.7713442,lng: -73.948878}}
-      			/>
-		    </div>
+					google={this.props.google}
+					zoom={13}
+					style={mapStyles}
+					initialCenter={{ lat: 40.7713442, lng: -73.948878 }}
+				>
+				{this.props.start!==undefined && 
+					<Marker
+						position={{
+							lat: this.props.start.lat,
+							lng: this.props.start.lng
+						}}
+					/>
+				}
+				{this.props.end!==undefined && 
+					<Marker
+						position={{
+							lat: this.props.end.lat,
+							lng: this.props.end.lng
+						}}
+					/>
+				}
+				</Map>
+			</div>
 		);
 	}
 }
 
 export default GoogleApiWrapper({
 	apiKey: 'AIzaSyApINK6lyjup-OdNACkI2OpUhQWGeJ1n-I'
-  })(MapContainer);
+})(MapContainer);

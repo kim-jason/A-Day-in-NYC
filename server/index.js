@@ -33,6 +33,13 @@ app.get('/zones', routes.getAllZones);
 
 app.get('/pois/:zone', routes.getNumPOIS);
 
+app.get('/lyftPrice/:start_lat/:start_lng/:end_lat/:end_lng', routes.getLyftPrice);
+
+app.get('/taxiPrice/:start_lat/:start_lng/:end_lat/:end_lng/:hour', routes.getTaxiPrice);
+
+app.get('/subwayStops/:start_lat/:start_lng/:end_lat/:end_lng', routes.getSubwayStops);
+
+
 /* ---- Q1b (Dashboard) ---- */
 app.get('/genres/:genre', routes.getTopInGenre); // Hint: Replace () => {} with the appropriate route handler.
 

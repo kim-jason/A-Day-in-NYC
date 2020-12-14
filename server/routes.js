@@ -120,6 +120,92 @@ function getNumPOIS(req, res) {
     if (err) {
       console.log(err);
     } else {
+      console.log(rows);
+      res.json(rows);
+    }
+  });
+}
+/* ---- Page 2 queries ---- */
+
+function getLyftPrice(req, res) {
+  console.log("getting lyft prices");
+  var query = `WITH start_point AS 
+  (SELECT start_lat, start_lng, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.start_lat}))*SIN(RADIANS(${req.params.start_lng}-start_lng)),2) + POWER(COS(RADIANS(start_lat))*SIN(RADIANS(${req.params.start_lat})) - (SIN(RADIANS(start_lat))*COS(RADIANS(${req.params.start_lat})) * COS(RADIANS(${req.params.start_lng}-start_lng))), 2)), SIN(RADIANS(start_lat))*SIN(RADIANS(${req.params.start_lat})) + COS(RADIANS(start_lat))*COS(RADIANS(${req.params.start_lat}))*COS(RADIANS(${req.params.start_lng}-start_lng)))) AS distance
+  FROM Lyft ORDER BY distance ASC LIMIT 1),
+  end_point AS 
+  (SELECT end_lat, end_lng, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.end_lat}))*SIN(RADIANS(${req.params.end_lng}-end_lng)),2) + POWER(COS(RADIANS(end_lat))*SIN(RADIANS(${req.params.end_lat})) - (SIN(RADIANS(end_lat))*COS(RADIANS(${req.params.end_lat})) * COS(RADIANS(${req.params.end_lng}-end_lng))), 2)), SIN(RADIANS(end_lat))*SIN(RADIANS(${req.params.end_lat})) + COS(RADIANS(end_lat))*COS(RADIANS(${req.params.end_lat}))*COS(RADIANS(${req.params.end_lng}-end_lng)))) AS distance
+  FROM Lyft ORDER BY distance ASC LIMIT 1)
+  SELECT reg_price, reg_duration FROM Lyft l
+  JOIN start_point s ON l.start_lat = s.start_lat AND l.start_lng = s.start_lng JOIN end_point e ON l.end_lat = e.end_lat AND l.end_lng = e.end_lng;  
+  `;
+  connection.query(query, function(err, rows, fields) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(rows);
+    }
+  });
+}
+
+
+function getTaxiPrice(req, res) {
+  console.log("getting taxi prices");
+  var query = `WITH start_point AS
+  (SELECT zone_id, centroid_lat, centroid_lng, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.start_lat}))*SIN(RADIANS(${req.params.start_lng}-centroid_lng)),2) + POWER(COS(RADIANS(centroid_lat))*SIN(RADIANS(${req.params.start_lat})) - (SIN(RADIANS(centroid_lat))*COS(RADIANS(${req.params.start_lat})) * COS(RADIANS(${req.params.start_lng}-centroid_lng))), 2)), SIN(RADIANS(centroid_lat))*SIN(RADIANS(${req.params.start_lat})) + COS(RADIANS(centroid_lat))*COS(RADIANS(${req.params.start_lat}))*COS(RADIANS(${req.params.start_lng}-centroid_lng)))) AS distance
+  FROM TaxiLookup ORDER BY distance ASC),
+  end_point AS
+  (SELECT zone_id, centroid_lat, centroid_lng, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.end_lat}))*SIN(RADIANS(${req.params.end_lng}-centroid_lng)),2) + POWER(COS(RADIANS(centroid_lat))*SIN(RADIANS(${req.params.end_lat})) - (SIN(RADIANS(centroid_lat))*COS(RADIANS(${req.params.end_lat})) * COS(RADIANS(${req.params.end_lng}-centroid_lng))), 2)), SIN(RADIANS(centroid_lat))*SIN(RADIANS(${req.params.end_lat})) + COS(RADIANS(centroid_lat))*COS(RADIANS(${req.params.end_lat}))*COS(RADIANS(${req.params.end_lng}-centroid_lng)))) AS distance
+  FROM TaxiLookup ORDER BY distance ASC)
+  SELECT AVG(price) AS price, AVG(duration) AS duration FROM Taxi t
+  JOIN start_point s ON t.start_zone_id = s.zone_id JOIN end_point e ON t.end_zone_id = e.zone_id
+  WHERE hour = ${req.params.hour}
+  GROUP BY s.distance + e.distance
+  ORDER BY s.distance + e.distance ASC
+  LIMIT 1;
+  
+  `;
+  connection.query(query, function(err, rows, fields) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(rows);
+      res.json(rows);
+    }
+  });
+}
+
+function getSubwayStops(req, res) {
+  console.log("getting subway prices");
+  console.log(req.params);
+  var query = `WITH start_station AS 
+  (SELECT station_name, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.start_lat}))*SIN(RADIANS(${req.params.start_lng}-lng)),2) + POWER(COS(RADIANS(lat))*SIN(RADIANS(${req.params.start_lat})) - (SIN(RADIANS(lat))*COS(RADIANS(${req.params.start_lat})) * COS(RADIANS(${req.params.start_lng}-lng))), 2)), SIN(RADIANS(lat))*SIN(RADIANS(${req.params.start_lat})) + COS(RADIANS(lat))*COS(RADIANS(${req.params.start_lat}))*COS(RADIANS(${req.params.start_lng}-lng)))) AS distance
+  FROM Stations ORDER BY distance ASC LIMIT 1),
+  end_station AS 
+  (SELECT station_name, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.end_lat}))*SIN(RADIANS(${req.params.end_lng}-lng)),2) + POWER(COS(RADIANS(lat))*SIN(RADIANS(${req.params.end_lat})) - (SIN(RADIANS(lat))*COS(RADIANS(${req.params.end_lat})) * COS(RADIANS(${req.params.end_lng}-lng))), 2)), SIN(RADIANS(lat))*SIN(RADIANS(${req.params.end_lat})) + COS(RADIANS(lat))*COS(RADIANS(${req.params.end_lat}))*COS(RADIANS(${req.params.end_lng}-lng)))) AS distance
+  FROM Stations ORDER BY distance ASC LIMIT 1),
+  0_Transfers AS (
+  SELECT s.station_name AS sourceStation, s.line AS sourceLine, a.station_name AS destStation, a.line AS destLine, 0 AS num_transfers FROM StationLine s JOIN StationLine a ON s.line = a.line WHERE s.station_name = (SELECT station_name FROM start_station) AND a.station_name = (SELECT station_name FROM end_station)),
+  1_Transfers_Helper AS (
+  SELECT s.sourceStation, s.sourceLine, s.destStation, a.line AS destLine FROM 0_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.sourceLine != a.line),
+  1_Transfers AS (
+  SELECT s.sourceStation, s.sourceLine, s.destStation AS firstStation, s.destLine AS firstLine, a.station_name AS destStation, a.line AS destLine, 1 AS num_transfers FROM 1_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.sourceStation = (SELECT station_name FROM start_station) AND a.station_name = (SELECT station_name FROM end_station)),
+  2_Transfers_Helper AS (
+  SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.destStation, a.line AS destLine FROM 1_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.firstLine != a.line AND s.sourceLine != a.line),
+  2_Transfers AS (
+  SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.destStation AS secondStation, s.destLine AS secondLine, a.station_name AS destStation, a.line AS destLine, 2 AS num_transfers FROM 2_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.firstStation != a.station_name AND s.firstLine != a.line AND s.destStation != a.station_name),
+  3_Transfers_Helper AS (
+  SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.secondStation, s.secondLine, s.destStation, a.line AS destLine FROM 2_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.secondLine != a.line AND s.firstLine != a.line AND s.sourceLine != a.line),
+  3_Transfers AS (
+  SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.secondStation, s.secondLine, s.destStation AS thirdStation, s.destLine AS thirdLine, a.station_name AS destStation, a.line AS destLine, 3 AS num_transfers FROM 3_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.firstStation != a.station_name AND s.firstLine != a.line AND s.secondStation != a.station_name AND s.secondLine != a.line AND s.destStation != a.station_name),
+  Combined AS (
+  SELECT sourceStation, sourceLine, Null AS firstStation, Null AS firstLine, Null AS secondStation, Null AS secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 0_Transfers UNION (SELECT sourceStation, sourceLine, firstStation, firstLine, Null AS secondStation, Null AS secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 1_Transfers) UNION (SELECT sourceStation, sourceLine, firstStation, firstLine, secondStation, secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 2_Transfers) UNION (SELECT * FROM 3_Transfers))
+  SELECT * FROM Combined LIMIT 1;  
+  `;
+  connection.query(query, function(err, rows, fields) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(rows);
       res.json(rows);
     }
   });
@@ -234,6 +320,9 @@ module.exports = {
   getStations: getStations,
   getNumPOIS: getNumPOIS,
   getAllZones: getAllZones,
+  getLyftPrice: getLyftPrice,
+  getTaxiPrice: getTaxiPrice,
+  getSubwayStops: getSubwayStops,
 	getAllGenres: getAllGenres,
 	getTopInGenre: getTopInGenre,
 	getRecs: getRecs,
