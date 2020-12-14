@@ -25,13 +25,13 @@ export default class App extends React.Component {
 						/>
 						<Route
 							exact
-							path="/dashboard"
+							path="/explore"
 							render={() => (
 								<Dashboard />
 							)}
 						/>
 						<Route
-							path="/recommendations"
+							path="/plan"
 							render={() => (
 								<Recommendations />
 							)}

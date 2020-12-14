@@ -2,8 +2,6 @@ import React from 'react';
 import '../style/Dashboard.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
-import GenreButton from './GenreButton';
-import DashboardMovieRow from './DashboardMovieRow';
 import Autocomp from './Autocomplete';
 import POICells from './POICells';
 import Slider from '@material-ui/core/Slider';
@@ -16,8 +14,6 @@ export default class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
-    // The state maintained by this React Component. This component maintains the list of genres,
-    // and a list of movies for a specified genre.
     this.state = {
       distance: 0.5,
       zone: "",
@@ -25,11 +21,10 @@ export default class Dashboard extends React.Component {
       interests: [],
       favorites: [],
       allZones: [],
-      graphData: []
+      graphData: [],
+      taxiZone: ""
     }
 
-    // this.handleLocationNameChange = this.handleLocationNameChange.bind(this);
-    // this.submitLocation = this.submitLocation.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.submitPOIS = this.submitPOIS.bind(this);
     this.addressSelected = this.addressSelected.bind(this);
@@ -38,6 +33,7 @@ export default class Dashboard extends React.Component {
     this.setZone = this.setZone.bind(this);
     this.getNumPOIS = this.getNumPOIS.bind(this);
     this.removePOI = this.removePOI.bind(this);
+    this.searchZone = this.searchZone.bind(this);
   }
 
 
@@ -94,7 +90,9 @@ export default class Dashboard extends React.Component {
     .then(res => res.json())
     .then(zoneList => {
       if(!zoneList) return;
-      console.log(zoneList);
+      this.setState({
+        taxiZone: zoneList[0].zone_name
+      })
     })
   }
   
@@ -171,31 +169,11 @@ export default class Dashboard extends React.Component {
     })
   }
 
-  /* ---- Q1b (Dashboard) ---- */
-  /* Set this.state.movies to a list of <DashboardMovieRow />'s. */
-  showMovies(genre) {
-        // Send an HTTP request to the server.
-    fetch(`http://localhost:8081/genres/${genre}`, {
-      method: 'GET' // The type of HTTP request.
-    })
-      .then(res => res.json()) // Convert the response data to a JSON.
-      .then(movieList => {
-        if (!movieList) return;
-        let movieDivs = movieList.map((movieObj, i) =>
-          <DashboardMovieRow title={movieObj.title} rating={movieObj.rating} voteCount={movieObj.vote_count}/>
-        );
-        this.setState({
-          movies: movieDivs
-        })
-      })
-      .catch(err => console.log(err))	// Print the error if there is one.
-
-  }
-
   addressSelected(latLng) {
     console.log(latLng);
     this.submitPOIS(latLng.lat, latLng.lng, this.state.distance)
     this.getStations(latLng.lat, latLng.lng, this.state.distance)
+    this.searchZone(latLng.lat, latLng.lng)
   }
 
   valuetext(value) {
@@ -222,6 +200,7 @@ export default class Dashboard extends React.Component {
            </div>
            <div class="d-flex justify-content-center my-4">
             </div>
+            <div class="middle-row" style={{display: 'flex', flexDirection: 'row'}} >
             <div class="slidecontainer">
                 <Slider
                   defaultValue={0.5}
@@ -236,9 +215,13 @@ export default class Dashboard extends React.Component {
                   onChange={this.handleChange}
                 />
             </div>
+            <div class="likely-taxi-zone" style={{marginLeft: '20em'}}>
+              <h3>{ this.state.stations.length == 0 ? ""  : `Taxi Zone: ${this.state.taxiZone}`}</h3>
+            </div>
+            </div>
             <div class="slidecontainer">
                 <p>Distance: {this.state.distance}</p>
-              </div>
+            </div>
               <div className="jumbotron">
               <div className="movies-container">
                 <div className="movies-header">

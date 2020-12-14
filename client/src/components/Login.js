@@ -2,18 +2,8 @@ import React from 'react';
 import firebase from 'firebase';
 import '../style/Dashboard.css';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import firebaseConfig from '../fb-config';
 
-var firebaseui = require('firebaseui');
-//Really should put this in another file
-var firebaseConfig = {
-    apiKey: "AIzaSyCqotvPiCbft4mE-o3qd16k0bCFtGi_ihc",
-    authDomain: "cis550project-3b56f.firebaseapp.com",
-    projectId: "cis550project-3b56f",
-    storageBucket: "cis550project-3b56f.appspot.com",
-    messagingSenderId: "493805368946",
-    appId: "1:493805368946:web:aae9b0158b9639b3e6b4eb",
-    measurementId: "G-D4G93BLSMW"
-  };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
@@ -35,7 +25,7 @@ export default class Login extends React.Component {
     },
     // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
     signInFlow: 'popup',
-    signInSuccessUrl: 'http://localhost:3000/dashboard',
+    signInSuccessUrl: 'http://localhost:3000/explore',
     signInOptions: [
       // Leave the lines as is for the providers you want to offer your users.
       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -52,8 +42,9 @@ export default class Login extends React.Component {
 // ui.start('#firebaseui-auth-container', uiConfig);
 
     render() {
+      console.log(firebase.auth())
         return (
-            <div>
+            <div style={{textAlign: 'center', marginTop: '5rem'}}>
                 <h1>New York Trips</h1>
                 {/* <div id="firebaseui-auth-container"></div> */}
                 {/* <div id="loader">Loading...</div> */}

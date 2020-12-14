@@ -40,3 +40,9 @@
 .jumbotron {
   background-color: rgb(149, 213, 245) !important;
 }
+
+/* .results-container {
+  height: 700px;
+  width: 1000px;
+  overflow-y: scroll;
+} */

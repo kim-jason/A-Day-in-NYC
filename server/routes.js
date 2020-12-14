@@ -38,7 +38,7 @@ function getPOIS(req, res) {
   SELECT POI_name
   FROM distances
   WHERE distance < ${req.params.distance}
-  ORDER BY POI_name
+  ORDER BY RAND()
   LIMIT 10;
   
   `;
