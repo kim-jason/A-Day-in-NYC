@@ -95,7 +95,7 @@ function ResultCells(props) {
             }
         </div>
 
-    )
+	)
 }
 
 export default ResultCells
