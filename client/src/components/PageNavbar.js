@@ -39,15 +39,15 @@ export default class PageNavbar extends React.Component {
 		return (
 			<div className="PageNavbar">
 				<nav className="navbar navbar-expand-lg navbar-light bg-light">
-			      <span className="navbar-brand center">A Day in NYC</span>
-			      <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-			        <div className="navbar-nav">
-			        {this.state.navDivs}
-			        </div>
-					<button type="button" className="btn btn-primary" onClick={() => window.location="/"}>Logout</button>
-			      </div>
-			    </nav>
+					<span className="navbar-brand center">A Day in NYC</span>
+					<div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+						<div className="navbar-nav">
+							{this.state.navDivs}
+						</div>
+						<button type="button" className="btn btn-primary" onClick={() => window.location = "/"}>Logout</button>
+					</div>
+				</nav>
 			</div>
-  	);
+		);
 	}
 }
