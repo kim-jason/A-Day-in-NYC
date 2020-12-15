@@ -45,7 +45,7 @@ export default class Login extends React.Component {
 		console.log(firebase.auth())
 		return (
 			<div style={{ textAlign: 'center', marginTop: '5rem' }}>
-				<h1>New York Trips</h1>
+				<h1>A Day in NYC</h1>
 				{/* <div id="firebaseui-auth-container"></div> */}
 				{/* <div id="loader">Loading...</div> */}
 				<StyledFirebaseAuth
