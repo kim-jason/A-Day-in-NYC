@@ -70,7 +70,8 @@ function getStations(req, res) {
   SELECT station_name
   FROM distances
   WHERE distance < ${req.params.distance}
-  ORDER BY station_name;
+  ORDER BY RAND()
+  LIMIT 5;
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) {

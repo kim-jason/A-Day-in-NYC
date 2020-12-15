@@ -174,6 +174,9 @@ export default class Dashboard extends React.Component {
     this.submitPOIS(latLng.lat, latLng.lng, this.state.distance)
     this.getStations(latLng.lat, latLng.lng, this.state.distance)
     this.searchZone(latLng.lat, latLng.lng)
+    this.setState( {
+      favorites: []
+    })
   }
 
   valuetext(value) {
@@ -216,7 +219,7 @@ export default class Dashboard extends React.Component {
                 />
             </div>
             <div class="likely-taxi-zone" style={{marginLeft: '20em'}}>
-              <h3>{ this.state.stations.length == 0 ? ""  : `Taxi Zone: ${this.state.taxiZone}`}</h3>
+              <h3>{ this.state.interests.length == 0 ? ""  : `Taxi Zone: ${this.state.taxiZone}`}</h3>
             </div>
             </div>
             <div class="slidecontainer">
