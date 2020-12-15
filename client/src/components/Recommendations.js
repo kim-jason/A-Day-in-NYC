@@ -76,17 +76,23 @@ export default class Recommendations extends React.Component {
 		const dest = this.endInputBox.current.state.address.split(',')[0];
 		const desc = start + " to " + dest;
 		let price = undefined;
+		let time = 0;
 		if (index === 0) {
 			price = (this.state.cellsData.taxi.price).toFixed(2);
+			price = parseFloat(price);
+			time = Math.round(this.state.cellsData.taxi.duration);
 		} else if (index === 1) {
 			price = (this.state.cellsData.lyft.reg_price / 100).toFixed(2);
+			price = parseFloat(price);
+			time = Math.round(this.state.cellsData.lyft.reg_duration / 60);
 		} else if (index === 2) {
-			price = "2.75";
+			price = 2.75;
 		}
 		const listItem = {
 			mode: index,
 			price: price,
-			description: desc
+			description: desc,
+			time: time
 		}
 		this.setState(prevState => ({
 			startPosition: undefined,
@@ -95,7 +101,7 @@ export default class Recommendations extends React.Component {
 			schedule: [...(prevState.schedule), listItem],
 			total: prevState.total+parseFloat(price)
 		}));
-		console.log(this.state.total);
+		console.log(this.state);
 		this.startInputBox.current.clearField();
 		this.endInputBox.current.clearField();
 	}
@@ -131,7 +137,8 @@ export default class Recommendations extends React.Component {
 				</div>
 				<div className="panel-right">
 					<Itinerary schedule={this.state.schedule} deleteItem={this.deleteItem}/>
-				{this.state.total>0 && <h6>total: ${this.state.total}</h6>}
+				{this.state.total>0 && <h6>total price: ${(this.state.schedule.reduce((a,b) => a + (b.price || 0),0))}</h6>}
+				{this.state.total>0 && <p>travel time: {this.state.schedule.reduce((a,b) => a + (b.time || 0),0)} min</p>}
 				</div>
 			</div>
 		);
