@@ -185,22 +185,24 @@ function getSubwayStops(req, res) {
   (SELECT station_name, (3959 * ATAN2(SQRT(POWER(COS(RADIANS(${req.params.end_lat}))*SIN(RADIANS(${req.params.end_lng}-lng)),2) + POWER(COS(RADIANS(lat))*SIN(RADIANS(${req.params.end_lat})) - (SIN(RADIANS(lat))*COS(RADIANS(${req.params.end_lat})) * COS(RADIANS(${req.params.end_lng}-lng))), 2)), SIN(RADIANS(lat))*SIN(RADIANS(${req.params.end_lat})) + COS(RADIANS(lat))*COS(RADIANS(${req.params.end_lat}))*COS(RADIANS(${req.params.end_lng}-lng)))) AS distance
   FROM Stations ORDER BY distance ASC LIMIT 1),
   0_Transfers AS (
-  SELECT s.station_name AS sourceStation, s.line AS sourceLine, a.station_name AS destStation, a.line AS destLine, 0 AS num_transfers FROM StationLine s JOIN StationLine a ON s.line = a.line WHERE s.station_name = (SELECT station_name FROM start_station) AND a.station_name = (SELECT station_name FROM end_station)),
-  1_Transfers_Helper AS (
-  SELECT s.sourceStation, s.sourceLine, s.destStation, a.line AS destLine FROM 0_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.sourceLine != a.line),
-  1_Transfers AS (
-  SELECT s.sourceStation, s.sourceLine, s.destStation AS firstStation, s.destLine AS firstLine, a.station_name AS destStation, a.line AS destLine, 1 AS num_transfers FROM 1_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.sourceStation = (SELECT station_name FROM start_station) AND a.station_name = (SELECT station_name FROM end_station)),
-  2_Transfers_Helper AS (
-  SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.destStation, a.line AS destLine FROM 1_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.firstLine != a.line AND s.sourceLine != a.line),
-  2_Transfers AS (
-  SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.destStation AS secondStation, s.destLine AS secondLine, a.station_name AS destStation, a.line AS destLine, 2 AS num_transfers FROM 2_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.firstStation != a.station_name AND s.firstLine != a.line AND s.destStation != a.station_name),
-  3_Transfers_Helper AS (
-  SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.secondStation, s.secondLine, s.destStation, a.line AS destLine FROM 2_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.secondLine != a.line AND s.firstLine != a.line AND s.sourceLine != a.line),
-  3_Transfers AS (
-  SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.secondStation, s.secondLine, s.destStation AS thirdStation, s.destLine AS thirdLine, a.station_name AS destStation, a.line AS destLine, 3 AS num_transfers FROM 3_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.firstStation != a.station_name AND s.firstLine != a.line AND s.secondStation != a.station_name AND s.secondLine != a.line AND s.destStation != a.station_name),
-  Combined AS (
-  SELECT sourceStation, sourceLine, Null AS firstStation, Null AS firstLine, Null AS secondStation, Null AS secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 0_Transfers UNION (SELECT sourceStation, sourceLine, firstStation, firstLine, Null AS secondStation, Null AS secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 1_Transfers) UNION (SELECT sourceStation, sourceLine, firstStation, firstLine, secondStation, secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 2_Transfers) UNION (SELECT * FROM 3_Transfers))
-  SELECT * FROM Combined LIMIT 1;  
+    SELECT s.station_name AS sourceStation, s.line AS sourceLine, a.station_name AS destStation, a.line AS destLine, 0 AS num_transfers FROM StationLine s JOIN StationLine a ON s.line = a.line WHERE s.station_name = (SELECT station_name FROM start_station)),
+    1_Transfers_Helper AS (
+    SELECT s.sourceStation, s.sourceLine, s.destStation, a.line AS destLine FROM 0_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.sourceLine != a.line),
+    1_Transfers AS (
+    SELECT s.sourceStation, s.sourceLine, s.destStation AS firstStation, s.destLine AS firstLine, a.station_name AS destStation, a.line AS destLine, 1 AS num_transfers FROM 1_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.sourceStation = (SELECT station_name FROM start_station)),
+    2_Transfers_Helper AS (
+    SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.destStation, a.line AS destLine FROM 1_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.firstLine != a.line AND s.sourceLine != a.line),
+    2_Transfers AS (
+    SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.destStation AS secondStation, s.destLine AS secondLine, a.station_name AS destStation, a.line AS destLine, 2 AS num_transfers FROM 2_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.firstStation != a.station_name AND s.firstLine != a.line AND s.destStation != a.station_name),
+    3_Transfers_Helper AS (
+    SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.secondStation, s.secondLine, s.destStation, a.line AS destLine FROM 2_Transfers s JOIN StationLine a ON s.destStation = a.station_name WHERE s.secondLine != a.line AND s.firstLine != a.line AND s.sourceLine != a.line),
+    3_Transfers AS (
+    SELECT s.sourceStation, s.sourceLine, s.firstStation, s.firstLine, s.secondStation, s.secondLine, s.destStation AS thirdStation, s.destLine AS thirdLine, a.station_name AS destStation, a.line AS destLine, 3 AS num_transfers FROM 3_Transfers_Helper s JOIN StationLine a ON s.destLine = a.line WHERE s.sourceStation != a.station_name AND s.sourceLine != a.line AND s.firstStation != a.station_name AND s.firstLine != a.line AND s.secondStation != a.station_name AND s.secondLine != a.line AND s.destStation != a.station_name),
+    Combined AS (
+    SELECT sourceStation, sourceLine, Null AS firstStation, Null AS firstLine, Null AS secondStation, Null AS secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 0_Transfers UNION (SELECT sourceStation, sourceLine, firstStation, firstLine, Null AS secondStation, Null AS secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 1_Transfers) UNION (SELECT sourceStation, sourceLine, firstStation, firstLine, secondStation, secondLine, Null AS thirdStation, Null AS thirdLine, destStation, destLine, num_Transfers FROM 2_Transfers) UNION (SELECT * FROM 3_Transfers))
+    SELECT * FROM Combined c
+    JOIN end_station e1 ON c.destStation = e1.station_name
+    LIMIT 1;
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) {
