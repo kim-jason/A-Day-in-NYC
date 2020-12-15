@@ -10,6 +10,10 @@ export default class LocationSearchInput extends React.Component {
     this.state = { address: '' };
   }
 
+  clearField() {
+    this.setState({address: ''});
+  }
+
   handleChange = address => {
     this.setState({ address });
   };

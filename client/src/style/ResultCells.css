@@ -5,7 +5,11 @@
     display: flex;
     justify-content: space-between;
     background-color: white;
+    cursor: pointer;
 }
+
+.usercell:hover { background-color: #dbf5ff8f; }
+.subwaycell:hover { background-color: #dbf5ff8f; }
 
 .cellinfo{
     margin-left: 15px;
@@ -35,9 +39,10 @@
 
 .subwaycell{
     margin: 5px;
-    padding: 30px 20px 15px 20px;
+    padding: 20px 20px 15px 20px;
     border-radius: 6px;
     background-color: white;
+    cursor: pointer;
     /* display: flex;
     flex-direction: column; */
 }
@@ -50,5 +55,5 @@
 .subwayDirections{
     /* background-color: violet; */
     padding-left: 10px;
-    padding-top: 5px;
+    padding-top: 0px;
 }
