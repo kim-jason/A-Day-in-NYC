@@ -1,5 +1,5 @@
 import React from 'react';
-import '../style/Dashboard.css';
+import '../style/Explore.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
 import Autocomp from './Autocomplete';
@@ -10,7 +10,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import FavoriteCells from './FavoriteCells';
 import { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries, VerticalBarSeries, VerticalGridLines, LabelSeries } from 'react-vis';
 
-export default class Dashboard extends React.Component {
+export default class Explore extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -217,7 +217,7 @@ export default class Dashboard extends React.Component {
 							</div>
 						</div>
 						<div class="slidecontainer">
-							<p>Distance: {this.state.distance}</p>
+							<p>Distance: {this.state.distance} miles</p>
 						</div>
 						<div className="jumbotron">
 							<div className="movies-container">

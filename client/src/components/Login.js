@@ -1,6 +1,6 @@
 import React from 'react';
 import firebase from 'firebase';
-import '../style/Dashboard.css';
+import '../style/Explore.css';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebaseConfig from '../fb-config';
 

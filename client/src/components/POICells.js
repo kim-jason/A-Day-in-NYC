@@ -27,7 +27,7 @@ export default class POICells extends React.Component {
 				<div className='usercell'>
 					<div className="header-left">
 						<div className="cellinfo">
-							<h4>{this.props.name}</h4>
+							<h4 className="text-box" >{this.props.name}</h4>
 						</div>
 					</div>
 					<div className="header-right" onClick={this.favoritePOI} ><h5>{this.state.favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}</h5></div>

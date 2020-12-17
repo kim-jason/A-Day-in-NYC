@@ -1,5 +1,5 @@
 import React from 'react';
-import '../style/Recommendations.css';
+import '../style/Plan.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';

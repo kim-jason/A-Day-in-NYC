@@ -1,5 +1,5 @@
 import React from 'react';
-import '../style/Recommendations.css';
+import '../style/Plan.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
 import Map from './Map';
@@ -10,7 +10,7 @@ import { Button } from '@material-ui/core';
 
 
 
-export default class Recommendations extends React.Component {
+export default class Plan extends React.Component {
 
 	constructor(props) {
 		super(props);

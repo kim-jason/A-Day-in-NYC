@@ -11,13 +11,14 @@
 
 .cellinfo{
     margin-left: 15px;
+    width: 100%;
     /* align-items: center; */
 }
 
 .header-left{
     display: flex;
     align-items: center;
-    width: 100px;
+    width: 750px !important;
 }
 
 .header-right{
@@ -38,3 +39,7 @@
 /* .resultCells {
     width: 100%;
 } */
+
+.text-box {
+    width: fit-content;
+}
